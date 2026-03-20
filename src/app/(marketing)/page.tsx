@@ -175,11 +175,11 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="lg:w-1/2 flex flex-col gap-6">
-            <div className="relative">
-              <div className="w-[240px] h-[170px] rounded-lg bg-[#EAEAE8] flex items-center justify-center">
+            <div className="relative w-full max-w-[320px]">
+              <div className="w-[200px] sm:w-[240px] h-[140px] sm:h-[170px] rounded-lg bg-[#EAEAE8] flex items-center justify-center">
                 <p className="text-[#AAAAAA] text-sm font-sans">Team</p>
               </div>
-              <div className="w-[240px] h-[170px] rounded-lg bg-[#E0E0DE] flex items-center justify-center absolute top-5 left-14">
+              <div className="w-[200px] sm:w-[240px] h-[140px] sm:h-[170px] rounded-lg bg-[#E0E0DE] flex items-center justify-center absolute top-4 left-10 sm:top-5 sm:left-14">
                 <p className="text-[#AAAAAA] text-sm font-sans">Team</p>
               </div>
             </div>

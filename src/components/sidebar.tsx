@@ -15,7 +15,10 @@ import {
   Code,
   Columns3,
   LogOut,
+  Menu,
+  X,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const navGroups = [
   {
@@ -47,20 +50,11 @@ const navGroups = [
   },
 ];
 
-export function Sidebar() {
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex w-56 flex-col border-r border-gray-200/80 bg-white">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 h-12 border-b border-gray-200/80">
-        <SynapseLogo className="h-6 w-6" />
-        <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
-          Synapse
-        </span>
-      </div>
-
-      {/* Navigation */}
+    <>
       <nav className="flex-1 px-3 py-3 space-y-4 overflow-y-auto">
         {navGroups.map((group, gi) => (
           <div key={gi}>
@@ -80,6 +74,7 @@ export function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={onNavigate}
                     className={cn(
                       "flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-colors",
                       isActive
@@ -97,13 +92,76 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom */}
       <div className="px-3 py-3 border-t border-gray-200/80">
         <button className="flex items-center gap-2.5 w-full px-3 py-[7px] rounded-lg text-[13px] font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors">
           <LogOut className="h-[15px] w-[15px]" />
           Log out
         </button>
       </div>
+    </>
+  );
+}
+
+export function MobileSidebarTrigger() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="md:hidden flex items-center justify-center h-8 w-8 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+      >
+        <Menu className="h-[18px] w-[18px]" />
+      </button>
+
+      {/* Overlay */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
+            onClick={() => setOpen(false)}
+          />
+          <aside className="absolute left-0 top-0 h-full w-64 bg-white shadow-xl flex flex-col animate-in slide-in-from-left duration-200">
+            <div className="flex items-center justify-between px-5 h-12 border-b border-gray-200/80">
+              <div className="flex items-center gap-2.5">
+                <SynapseLogo className="h-6 w-6" />
+                <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
+                  Synapse
+                </span>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-[16px] w-[16px]" />
+              </button>
+            </div>
+            <SidebarContent onNavigate={() => setOpen(false)} />
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <aside className="hidden md:flex w-56 flex-col border-r border-gray-200/80 bg-white">
+      {/* Logo */}
+      <div className="flex items-center gap-2.5 px-5 h-12 border-b border-gray-200/80">
+        <SynapseLogo className="h-6 w-6" />
+        <span className="text-[14px] font-semibold text-gray-900 tracking-tight">
+          Synapse
+        </span>
+      </div>
+
+      <SidebarContent />
     </aside>
   );
 }

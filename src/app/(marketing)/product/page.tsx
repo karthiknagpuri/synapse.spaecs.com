@@ -25,7 +25,7 @@ export default function ProductPage() {
           Habit tracking, health monitoring, meeting summaries, and public
           speaking coaching. All processed locally with client-side encryption.
         </p>
-        <div className="flex gap-12 mb-8">
+        <div className="flex flex-wrap gap-6 sm:gap-12 mb-8">
           <div>
             <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-wider mb-1">
               Spec
@@ -57,7 +57,7 @@ export default function ProductPage() {
           Developer SDK, AI app store, and support for all major AI models.
           Join the community building the future of personal AI.
         </p>
-        <div className="flex gap-12 mb-8">
+        <div className="flex flex-wrap gap-6 sm:gap-12 mb-8">
           <div>
             <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-wider mb-1">
               Spec
@@ -87,7 +87,7 @@ export default function ProductPage() {
           Client-side encryption means your data never leaves your device.
           Open-source hardware you can trust, with no tracking or surveillance.
         </p>
-        <div className="flex gap-12 mb-8">
+        <div className="flex flex-wrap gap-6 sm:gap-12 mb-8">
           <div>
             <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-wider mb-1">
               Spec

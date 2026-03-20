@@ -116,7 +116,7 @@ export default function MarketingLayout({
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-[220px] px-6 sm:px-10 lg:px-10 xl:px-14 pt-20 lg:pt-[120px] max-w-[860px]">
+        <main className="flex-1 lg:ml-[220px] px-5 sm:px-10 lg:px-10 xl:px-14 pt-20 lg:pt-[120px] w-full max-w-[860px]">
           {children}
         </main>
       </div>

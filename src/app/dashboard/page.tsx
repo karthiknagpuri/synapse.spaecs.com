@@ -93,18 +93,18 @@ export default async function DashboardPage() {
       <PeopleBento />
 
       {/* Stats Row */}
-      <div className="grid grid-cols-5 gap-1.5">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-1.5">
         {stats.map((stat) => (
           <Link
             key={stat.label}
             href={stat.href}
-            className="group flex flex-col items-center gap-0.5 py-4 px-2 rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)] hover:shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300"
+            className="group flex flex-col items-center gap-0.5 py-3 px-2 sm:py-4 rounded-2xl bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04)] hover:shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300"
           >
-            <stat.icon className="h-3.5 w-3.5 text-gray-300 group-hover:text-gray-400 transition-colors" />
-            <p className="text-xl font-semibold text-gray-900 tracking-tight tabular-nums leading-none mt-1.5">
+            <stat.icon className="h-4 w-4 sm:h-3.5 sm:w-3.5 text-gray-300 group-hover:text-gray-400 transition-colors" />
+            <p className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight tabular-nums leading-none mt-1.5">
               {stat.value}
             </p>
-            <p className="text-[10px] text-gray-300 uppercase tracking-widest font-medium mt-1 group-hover:text-gray-400 transition-colors">
+            <p className="text-[10px] sm:text-[10px] text-gray-300 uppercase tracking-widest font-medium mt-1 group-hover:text-gray-400 transition-colors">
               {stat.label}
             </p>
           </Link>

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { ProfileDropdown } from "@/components/profile-dropdown";
 import { TopbarBreadcrumb } from "@/components/topbar-breadcrumb";
+import { MobileSidebarTrigger } from "@/components/sidebar";
 import { Bell } from "lucide-react";
 
 export async function Topbar() {
@@ -14,8 +15,11 @@ export async function Topbar() {
   const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || "";
 
   return (
-    <header className="flex items-center justify-between h-12 px-6 border-b border-gray-200/80 bg-white">
-      <TopbarBreadcrumb />
+    <header className="flex items-center justify-between h-12 px-4 sm:px-6 border-b border-gray-200/80 bg-white">
+      <div className="flex items-center gap-2">
+        <MobileSidebarTrigger />
+        <TopbarBreadcrumb />
+      </div>
 
       <div className="flex items-center gap-1">
         <button className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors">

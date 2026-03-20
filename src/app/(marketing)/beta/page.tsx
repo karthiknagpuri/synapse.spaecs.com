@@ -185,7 +185,7 @@ export default function BetaPage() {
               step={500}
               value={guess}
               onChange={(e) => setGuess(Number(e.target.value))}
-              className="w-full h-1.5 bg-[#E5E5E3] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-[#1A1A1A] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+              className="w-full h-1.5 bg-[#E5E5E3] rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-[#1A1A1A] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
             />
             <div className="flex justify-between mt-2">
               <span className="text-[#AAAAAA] text-[12px] font-sans">
