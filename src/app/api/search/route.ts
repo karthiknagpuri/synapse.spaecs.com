@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { generateEmbedding, translateQuery, generateWhyMatched } from "@/lib/openai";
+import { generateEmbedding, translateQuery, generateWhyMatched, rerankResults } from "@/lib/openai";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
     // Step 2: Generate embedding for search text
     const embedding = await generateEmbedding(structured.searchText);
 
-    // Step 3: Call Supabase RPC for hybrid search
+    // Step 3: Call Supabase RPC for hybrid search (retrieve more for re-ranking)
     const { data: results, error } = await supabase.rpc("semantic_search", {
       query_embedding: JSON.stringify(embedding),
       match_user_id: user.id,
-      match_count: 20,
+      match_count: 30,
       filter_location: structured.filters.location || null,
       filter_platform: structured.filters.platform || null,
       filter_after: structured.filters.dateAfter || null,
@@ -46,9 +46,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 4: Generate "Why matched" for top results
+    // Step 4: LLM Re-ranking with weighted trait scoring
+    const candidates = (results || []).map((r: any) => ({
+      contact_id: r.contact_id,
+      full_name: r.full_name,
+      title: r.title,
+      company: r.company,
+      location: r.location,
+      tags: r.tags,
+      bio: r.bio,
+      similarity: r.similarity,
+      // Pass through extra fields
+      email: r.email,
+      avatar_url: r.avatar_url,
+      linkedin_url: r.linkedin_url,
+      twitter_handle: r.twitter_handle,
+      relationship_score: r.relationship_score,
+      source: r.source,
+    }));
+
+    const ranked = await rerankResults(query, candidates);
+
+    // Step 5: Generate "Why matched" for top 10 re-ranked results
     const enrichedResults = await Promise.all(
-      (results || []).slice(0, 10).map(async (result: any) => {
+      ranked.slice(0, 10).map(async (result) => {
         const { data: interactions } = await supabase
           .from("interactions")
           .select("type, subject, occurred_at")
@@ -65,18 +86,9 @@ export async function POST(request: NextRequest) {
           interactions: interactions || [],
         });
 
-        // Determine which fields contributed to match
-        const matchedFields: string[] = [];
-        if (structured.filters.location && result.location) matchedFields.push("location");
-        if (structured.filters.platform) matchedFields.push("platform");
-        if (structured.filters.tags?.length) matchedFields.push("tags");
-        if (result.title) matchedFields.push("title");
-        if (result.company) matchedFields.push("company");
-
         return {
           ...result,
           why_matched: whyMatched,
-          matched_fields: matchedFields,
         };
       })
     );

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateApiKey, supabaseAdmin } from "@/lib/api-auth";
 import { apiError } from "@/lib/api-error";
 import { checkRateLimit, incrementUsage } from "@/lib/rate-limit";
-import { generateEmbedding, translateQuery, generateWhyMatched } from "@/lib/openai";
+import { generateEmbedding, translateQuery, generateWhyMatched, rerankResults } from "@/lib/openai";
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateApiKey(request);
@@ -95,11 +95,11 @@ async function runSearchPipeline(jobId: string, userId: string, query: string) {
     // Step 2: Generate query embedding
     const embedding = await generateEmbedding(structured.searchText);
 
-    // Step 3: Vector similarity search
+    // Step 3: Vector similarity search (retrieve 30 for re-ranking)
     const { data: results, error } = await supabaseAdmin.rpc("semantic_search", {
       query_embedding: JSON.stringify(embedding),
       match_user_id: userId,
-      match_count: 20,
+      match_count: 30,
       filter_location: structured.filters.location || null,
       filter_platform: structured.filters.platform || null,
       filter_after: structured.filters.dateAfter || null,
@@ -107,9 +107,23 @@ async function runSearchPipeline(jobId: string, userId: string, query: string) {
 
     if (error) throw new Error(`Search RPC failed: ${error.message}`);
 
-    // Step 4: Enrich top 10 with "why matched"
+    // Step 4: LLM Re-ranking with weighted trait scoring
+    const candidates = (results || []).map((r: any) => ({
+      contact_id: r.contact_id,
+      full_name: r.full_name,
+      title: r.title,
+      company: r.company,
+      location: r.location,
+      tags: r.tags,
+      bio: r.bio,
+      similarity: r.similarity,
+    }));
+
+    const ranked = await rerankResults(query, candidates);
+
+    // Step 5: Enrich top 10 re-ranked results with "why matched"
     const enriched = await Promise.all(
-      (results || []).slice(0, 10).map(async (result: any) => {
+      ranked.slice(0, 10).map(async (result) => {
         const whyMatched = await generateWhyMatched(query, {
           full_name: result.full_name,
           company: result.company,
@@ -119,18 +133,23 @@ async function runSearchPipeline(jobId: string, userId: string, query: string) {
           interactions: [],
         });
 
+        // Find the original result for extra fields
+        const original = (results || []).find((r: any) => r.contact_id === result.contact_id);
+
         return {
           id: result.contact_id,
           name: result.full_name,
           current_title: result.title,
           current_company: result.company,
           location: result.location,
-          email: result.email,
+          email: original?.email || null,
           summary: whyMatched,
-          weighted_traits_score: Math.round(result.similarity * 100) / 100,
+          weighted_traits_score: result.weighted_traits_score,
+          confidence: result.confidence,
+          trait_scores: result.trait_scores,
           socials: {
-            linkedin_url: result.linkedin_url || null,
-            twitter_handle: result.twitter_handle || null,
+            linkedin_url: original?.linkedin_url || null,
+            twitter_handle: original?.twitter_handle || null,
           },
         };
       })
