@@ -13,7 +13,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { query } = await request.json();
+    const body = await request.json();
+    const { query, include_friends, group_ids } = body as {
+      query: string;
+      include_friends?: boolean;
+      group_ids?: string[];
+    };
 
     if (!query || typeof query !== "string") {
       return NextResponse.json(
@@ -28,26 +33,72 @@ export async function POST(request: NextRequest) {
     // Step 2: Generate embedding for search text
     const embedding = await generateEmbedding(structured.searchText);
 
-    // Step 3: Call Supabase RPC for hybrid search (retrieve more for re-ranking)
-    const { data: results, error } = await supabase.rpc("semantic_search", {
-      query_embedding: JSON.stringify(embedding),
-      match_user_id: user.id,
-      match_count: 30,
-      filter_location: structured.filters.location || null,
-      filter_platform: structured.filters.platform || null,
-      filter_after: structured.filters.dateAfter || null,
-    });
+    // Step 3: Build user ID list for network search
+    const userIds = [user.id];
 
-    if (error) {
-      console.error("Search RPC error:", error);
-      return NextResponse.json(
-        { error: "Search failed" },
-        { status: 500 }
-      );
+    if (include_friends) {
+      const { data: friendships } = await supabase
+        .from("friendships")
+        .select("friend_id")
+        .eq("user_id", user.id);
+      if (friendships) {
+        userIds.push(...friendships.map((f) => f.friend_id));
+      }
     }
 
-    // Step 4: LLM Re-ranking with weighted trait scoring
-    const candidates = (results || []).map((r: any) => ({
+    if (group_ids && group_ids.length > 0) {
+      const { data: members } = await supabase
+        .from("group_members")
+        .select("user_id")
+        .in("group_id", group_ids);
+      if (members) {
+        for (const m of members) {
+          if (!userIds.includes(m.user_id)) {
+            userIds.push(m.user_id);
+          }
+        }
+      }
+    }
+
+    // Step 4: Search across network
+    const isNetworkSearch = userIds.length > 1;
+
+    let results: any[] = [];
+
+    if (isNetworkSearch) {
+      const { data, error } = await supabase.rpc("network_semantic_search", {
+        query_embedding: JSON.stringify(embedding),
+        match_user_ids: userIds,
+        match_count: 30,
+        filter_location: structured.filters.location || null,
+        filter_platform: structured.filters.platform || null,
+        filter_after: structured.filters.dateAfter || null,
+      });
+
+      if (error) {
+        console.error("Network search RPC error:", error);
+        return NextResponse.json({ error: "Search failed" }, { status: 500 });
+      }
+      results = data || [];
+    } else {
+      const { data, error } = await supabase.rpc("semantic_search", {
+        query_embedding: JSON.stringify(embedding),
+        match_user_id: user.id,
+        match_count: 30,
+        filter_location: structured.filters.location || null,
+        filter_platform: structured.filters.platform || null,
+        filter_after: structured.filters.dateAfter || null,
+      });
+
+      if (error) {
+        console.error("Search RPC error:", error);
+        return NextResponse.json({ error: "Search failed" }, { status: 500 });
+      }
+      results = data || [];
+    }
+
+    // Step 5: LLM Re-ranking
+    const candidates = results.map((r: any) => ({
       contact_id: r.contact_id,
       full_name: r.full_name,
       title: r.title,
@@ -63,11 +114,12 @@ export async function POST(request: NextRequest) {
       twitter_handle: r.twitter_handle,
       relationship_score: r.relationship_score,
       source: r.source,
+      owner_user_id: r.owner_user_id,
     }));
 
     const ranked = await rerankResults(query, candidates);
 
-    // Step 5: Generate "Why matched" for top 10 re-ranked results
+    // Step 6: Generate "Why matched" for top 10
     const enrichedResults = await Promise.all(
       ranked.slice(0, 10).map(async (result) => {
         const { data: interactions } = await supabase
@@ -86,10 +138,17 @@ export async function POST(request: NextRequest) {
           interactions: interactions || [],
         });
 
-        return {
+        const entry: any = {
           ...result,
           why_matched: whyMatched,
         };
+
+        // For network results, indicate who knows this contact
+        if (isNetworkSearch && (result as any).owner_user_id && (result as any).owner_user_id !== user.id) {
+          entry.connected_through = (result as any).owner_user_id;
+        }
+
+        return entry;
       })
     );
 
@@ -97,6 +156,8 @@ export async function POST(request: NextRequest) {
       results: enrichedResults,
       structured_query: structured,
       total: enrichedResults.length,
+      network_search: isNetworkSearch,
+      users_searched: userIds.length,
     });
   } catch (err) {
     console.error("Search error:", err);
