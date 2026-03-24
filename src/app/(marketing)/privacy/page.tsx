@@ -146,10 +146,10 @@ export default function PrivacyPage() {
         <P>
           To exercise any of these rights, contact us at{" "}
           <a
-            href="mailto:privacy@synapse.com"
+            href="mailto:privacy@wearsynapse.com"
             className="text-[#1A1A1A] underline underline-offset-4 decoration-[#E5E5E3] hover:decoration-[#1A1A1A] transition-colors duration-200"
           >
-            privacy@synapse.com
+            privacy@wearsynapse.com
           </a>
           .
         </P>
@@ -227,19 +227,19 @@ export default function PrivacyPage() {
           <P>
             Email:{" "}
             <a
-              href="mailto:privacy@synapse.com"
+              href="mailto:privacy@wearsynapse.com"
               className="text-[#1A1A1A] underline underline-offset-4 decoration-[#E5E5E3] hover:decoration-[#1A1A1A] transition-colors duration-200"
             >
-              privacy@synapse.com
+              privacy@wearsynapse.com
             </a>
           </P>
           <P>
             Web:{" "}
             <a
-              href="https://synapse.spaecs.com"
+              href="https://wearsynapse.com"
               className="text-[#1A1A1A] underline underline-offset-4 decoration-[#E5E5E3] hover:decoration-[#1A1A1A] transition-colors duration-200"
             >
-              synapse.spaecs.com
+              wearsynapse.com
             </a>
           </P>
         </div>

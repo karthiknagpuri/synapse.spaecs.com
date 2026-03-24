@@ -50,7 +50,7 @@ export default function TeamPage() {
           want to build technology that amplifies it.
         </p>
         <a
-          href="mailto:careers@synapse.com"
+          href="mailto:careers@wearsynapse.com"
           className="inline-flex items-center gap-2 text-[#1A1A1A] text-[15px] font-sans group"
         >
           <span className="underline underline-offset-4 decoration-[#E5E5E3] group-hover:decoration-[#1A1A1A] transition-colors duration-200">

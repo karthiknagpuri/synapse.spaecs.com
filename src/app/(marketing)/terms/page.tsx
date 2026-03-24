@@ -178,10 +178,10 @@ export default function TermsPage() {
         <P>
           If you have questions about these Terms, contact us at{" "}
           <a
-            href="mailto:legal@synapse.com"
+            href="mailto:legal@wearsynapse.com"
             className="text-[#1A1A1A] underline underline-offset-4 decoration-[#E5E5E3] hover:decoration-[#1A1A1A] transition-colors duration-200"
           >
-            legal@synapse.com
+            legal@wearsynapse.com
           </a>
           .
         </P>

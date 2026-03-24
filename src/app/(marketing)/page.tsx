@@ -208,7 +208,7 @@ export default function LandingPage() {
               <Link href="/" className="text-[#888888] text-[14px] font-sans hover:text-[#1A1A1A] transition-colors duration-200">Home</Link>
               <Link href="/research" className="text-[#888888] text-[14px] font-sans hover:text-[#1A1A1A] transition-colors duration-200">Research</Link>
               <Link href="/team" className="text-[#888888] text-[14px] font-sans hover:text-[#1A1A1A] transition-colors duration-200">Team</Link>
-              <a href="mailto:info@synapse.com" className="text-[#888888] text-[14px] font-sans hover:text-[#1A1A1A] transition-colors duration-200">Contact us</a>
+              <a href="mailto:info@wearsynapse.com" className="text-[#888888] text-[14px] font-sans hover:text-[#1A1A1A] transition-colors duration-200">Contact us</a>
             </div>
             <div className="flex gap-5">
               <a href="https://x.com/synapse" target="_blank" rel="noopener noreferrer" className="text-[#AAAAAA] hover:text-[#1A1A1A] transition-colors duration-200">
