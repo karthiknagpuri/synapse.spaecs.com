@@ -9,6 +9,90 @@ const supabaseAdmin = createServiceClient(
 );
 
 /**
+ * Find connection paths to a person through the user's network and friends.
+ * Returns intro paths like: You → Friend → Target Person
+ */
+async function findConnectionPaths(
+  userId: string,
+  name: string,
+  email: string | null
+): Promise<{ type: string; via?: string; via_user_id?: string; contact_id: string; relationship_score: number }[]> {
+  const paths: { type: string; via?: string; via_user_id?: string; contact_id: string; relationship_score: number }[] = [];
+
+  try {
+    // Direct connection — in user's own contacts
+    const directQuery = supabaseAdmin
+      .from("contacts")
+      .select("id, full_name, relationship_score")
+      .eq("user_id", userId);
+
+    if (email) {
+      directQuery.or(`full_name.ilike.%${name}%,email.eq.${email}`);
+    } else {
+      directQuery.ilike("full_name", `%${name}%`);
+    }
+
+    const { data: directMatches } = await directQuery.limit(3);
+
+    if (directMatches && directMatches.length > 0) {
+      for (const m of directMatches) {
+        paths.push({
+          type: "direct",
+          contact_id: m.id,
+          relationship_score: m.relationship_score || 0,
+        });
+      }
+    }
+
+    // Friend connections — search friends' contacts
+    const { data: friendships } = await supabaseAdmin
+      .from("friendships")
+      .select("friend_id")
+      .eq("user_id", userId);
+
+    if (friendships && friendships.length > 0) {
+      const friendIds = friendships.map((f) => f.friend_id);
+
+      for (const friendId of friendIds.slice(0, 10)) {
+        const friendQuery = supabaseAdmin
+          .from("contacts")
+          .select("id, full_name, relationship_score")
+          .eq("user_id", friendId);
+
+        if (email) {
+          friendQuery.or(`full_name.ilike.%${name}%,email.eq.${email}`);
+        } else {
+          friendQuery.ilike("full_name", `%${name}%`);
+        }
+
+        const { data: friendMatches } = await friendQuery.limit(1);
+
+        if (friendMatches && friendMatches.length > 0) {
+          // Get friend's name
+          const { data: friendProfile } = await supabaseAdmin
+            .from("profiles")
+            .select("full_name")
+            .eq("id", friendId)
+            .single();
+
+          paths.push({
+            type: "friend",
+            via: friendProfile?.full_name || "A friend",
+            via_user_id: friendId,
+            contact_id: friendMatches[0].id,
+            relationship_score: friendMatches[0].relationship_score || 0,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error("[Research] Connection path finding error:", err);
+  }
+
+  return paths;
+}
+
+/**
  * Run the full research pipeline for a person.
  * Uses Perplexity AI as primary research source when available,
  * with web search as supplementary/fallback.
@@ -149,9 +233,17 @@ export async function runResearchPipeline(
       perplexityCitations: perplexityCitations.length > 0 ? perplexityCitations : undefined,
     });
 
+    // Step 5: Find connection paths — does this person exist in the user's network?
+    const connectionPaths = await findConnectionPaths(userId, name, contactData?.email || null);
+
+    // Merge connection info into profile
+    if (connectionPaths.length > 0) {
+      (profile as any).connection_paths = connectionPaths;
+    }
+
     const processingTime = Date.now() - startTime;
 
-    // Step 5: Store results
+    // Step 6: Store results
     await supabaseAdmin
       .from("research_profiles")
       .update({
