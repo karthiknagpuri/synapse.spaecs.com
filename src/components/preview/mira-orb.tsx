@@ -19,8 +19,8 @@ const SYMBOLS =
 const NUM_PARTICLES = 520;
 const SYMBOL_SIZE = 11;
 
-const WORDS_IDLE = ["HELLO", "MIRA", "LISTEN"];
-const WORDS_LIVE = ["LISTENING", "MIRA", "HELLO"];
+const WORDS_IDLE = ["HELLO", "MIRA", "LISTEN", "SYNAPSE AI"];
+const WORDS_LIVE = ["LISTENING", "MIRA", "HELLO", "SYNAPSE AI"];
 const PHASE_MS = 4500;
 const MORPH_IN_START = 0.1;
 const MORPH_IN_END = 0.3;
