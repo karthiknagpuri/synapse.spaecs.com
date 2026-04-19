@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 
 const ACTUAL_PRICE = 4999;
-const ORIGINAL_PRICE = 12499;
+const ORIGINAL_PRICE = 9499;
 const MIN_GUESS = 5000;
 const MAX_GUESS = 40000;
 
@@ -81,11 +81,11 @@ export default function BetaPage() {
                 &#8377;4,999
               </span>
               <span className="text-[#AAAAAA] text-[20px] font-sans line-through">
-                &#8377;12,499
+                &#8377;9,499
               </span>
             </div>
             <div className="inline-block bg-[#1A1A1A] text-white text-[13px] font-sans font-medium px-3 py-1.5 rounded-full mb-6">
-              60% OFF
+              47% OFF
             </div>
             <p className="text-[#888888] text-[16px] leading-[1.65] font-sans mb-8">
               Claim your pre-order offer today as an early adopter. Lock in this

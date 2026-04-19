@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { SearchHero } from "@/components/search-hero";
 import { DashboardGrid } from "@/components/dashboard-grid";
+import { RoleBento } from "@/components/role-bento";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,7 @@ export default async function DashboardPage() {
         }}
         recentContacts={recentContacts}
       />
+      <RoleBento />
     </div>
   );
 }
