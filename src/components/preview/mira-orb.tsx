@@ -12,6 +12,11 @@ type Props = {
   modelAmpRef: AmpRef;
 };
 
+const COLS = 44;
+const ROWS = 22;
+const RAMP = [" ", "·", ":", "•", "○", "●", "█"];
+const CHAR_ASPECT = 0.6;
+
 export function MiraOrb({
   size = 280,
   live,
@@ -19,92 +24,101 @@ export function MiraOrb({
   userAmpRef,
   modelAmpRef,
 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const preRef = useRef<HTMLPreElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number>(0);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-    ctx.scale(dpr, dpr);
-
+    const el = preRef.current;
+    if (!el) return;
     startRef.current = performance.now();
 
-    const draw = (now: number) => {
+    const cx = COLS / 2;
+    const cy = ROWS / 2;
+
+    const loop = (now: number) => {
       const t = (now - startRef.current) / 1000;
-      ctx.clearRect(0, 0, size, size);
-
-      const cx = size / 2;
-      const cy = size / 2;
-      const coreBase = size * 0.22;
-
-      const breathing = 0.95 + Math.sin((t / 2) * Math.PI) * 0.025 + 0.025;
       const userAmp = live ? userAmpRef.current : 0;
       const modelAmp = live ? modelAmpRef.current : 0;
 
-      const scale = live
-        ? 1 + userAmp * 0.05 + modelAmp * 0.08
-        : breathing;
+      const idle = 0.28 + 0.04 * Math.sin(t * 0.7);
+      const energy = live
+        ? 0.45 + userAmp * 0.55 + modelAmp * 0.85
+        : idle;
 
-      const dim = muted ? 0.35 : 1;
-      const baseRingAlpha = live ? 0.55 : 0.35;
+      const orbit = 2.6 + energy * 2.1;
+      const radius = 3.1 + energy * 2.3;
+      const r2 = radius * radius;
+      const speed = live ? 1.0 : 0.35;
+      const a = t * speed;
 
-      ctx.fillStyle = muted ? "#888888" : "#1A1A1A";
+      const centers: [number, number][] = [
+        [
+          cx + Math.cos(a) * orbit,
+          cy + Math.sin(a * 1.3) * orbit * 0.5,
+        ],
+        [
+          cx + Math.cos(a * 1.4 + 2.1) * orbit * 0.8,
+          cy + Math.sin(a * 0.9 + 1.3) * orbit * 0.55,
+        ],
+        [
+          cx + Math.cos(a * 0.7 + 4.2) * orbit * 0.6,
+          cy + Math.sin(a * 1.6 + 3.1) * orbit * 0.5,
+        ],
+      ];
 
-      const ring = (radius: number, color: string, alpha: number) => {
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.globalAlpha = alpha * dim;
-        ctx.fill();
-      };
-
-      ring(
-        coreBase * scale * 2.4,
-        "#E5E5E3",
-        baseRingAlpha * 0.45 + modelAmp * 0.25
-      );
-      ring(
-        coreBase * scale * 1.85,
-        "#AAAAAA",
-        baseRingAlpha * 0.55 + modelAmp * 0.2
-      );
-      ring(
-        coreBase * scale * 1.35,
-        "#888888",
-        baseRingAlpha * 0.65 + userAmp * 0.25
-      );
-
-      ctx.globalAlpha = dim;
-      ctx.beginPath();
-      ctx.arc(cx, cy, coreBase * scale, 0, Math.PI * 2);
-      ctx.fillStyle = muted ? "#888888" : "#1A1A1A";
-      ctx.fill();
-      ctx.globalAlpha = 1;
-
-      rafRef.current = requestAnimationFrame(draw);
+      let out = "";
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          let field = 0;
+          for (let i = 0; i < centers.length; i++) {
+            const dx = (x - centers[i][0]) * CHAR_ASPECT;
+            const dy = y - centers[i][1];
+            const d2 = dx * dx + dy * dy + 0.01;
+            field += r2 / d2;
+          }
+          let idx: number;
+          if (field < 0.22) idx = 0;
+          else if (field < 0.45) idx = 1;
+          else if (field < 0.9) idx = 2;
+          else if (field < 1.55) idx = 3;
+          else if (field < 2.5) idx = 4;
+          else if (field < 4.2) idx = 5;
+          else idx = 6;
+          out += RAMP[idx];
+        }
+        if (y < ROWS - 1) out += "\n";
+      }
+      el.textContent = out;
+      rafRef.current = requestAnimationFrame(loop);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
+    rafRef.current = requestAnimationFrame(loop);
 
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, [live, muted, size, userAmpRef, modelAmpRef]);
+  }, [live, userAmpRef, modelAmpRef]);
+
+  const fontSize = (size / COLS) / CHAR_ASPECT;
 
   return (
-    <canvas
-      ref={canvasRef}
+    <pre
+      ref={preRef}
       aria-hidden="true"
-      className="select-none"
+      className="select-none font-mono"
+      style={{
+        fontSize: `${fontSize}px`,
+        lineHeight: 1,
+        letterSpacing: 0,
+        whiteSpace: "pre",
+        color: muted ? "#AAAAAA" : "#1A1A1A",
+        opacity: muted ? 0.55 : 1,
+        margin: 0,
+        width: `${size}px`,
+        textAlign: "center",
+        transition: "opacity 240ms ease",
+      }}
     />
   );
 }
