@@ -5,7 +5,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const WINDOW_MS = 60 * 60 * 1000;
-const MAX_PER_WINDOW = 6;
+const MAX_PER_WINDOW = 30;
+const RATE_LIMIT_ENABLED = process.env.NODE_ENV === "production";
 const hits = new Map<string, number[]>();
 
 function getClientIp(req: NextRequest): string {
@@ -17,6 +18,7 @@ function getClientIp(req: NextRequest): string {
 }
 
 function rateLimit(ip: string): boolean {
+  if (!RATE_LIMIT_ENABLED) return true;
   const now = Date.now();
   const arr = hits.get(ip) ?? [];
   const fresh = arr.filter((t) => now - t < WINDOW_MS);
