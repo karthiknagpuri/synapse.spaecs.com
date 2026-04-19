@@ -186,18 +186,28 @@ export function MiraOrb({
 
       const wordList = isLive ? liveTargets : idleTargets;
       const elapsed = now - start;
-      const phaseIndex = Math.floor(elapsed / PHASE_MS) % wordList.length;
-      const phase = (elapsed % PHASE_MS) / PHASE_MS;
-      let morph = 0;
-      if (phase < MORPH_IN_START) morph = 0;
-      else if (phase < MORPH_IN_END)
-        morph = (phase - MORPH_IN_START) / (MORPH_IN_END - MORPH_IN_START);
-      else if (phase < MORPH_OUT_START) morph = 1;
-      else if (phase < MORPH_OUT_END)
-        morph = 1 - (phase - MORPH_OUT_START) / (MORPH_OUT_END - MORPH_OUT_START);
-      else morph = 0;
-      const morphEased = easeInOutCubic(morph);
-      const wordTargets = wordList[phaseIndex];
+      let wordTargets: Point[] | undefined;
+      let morphEased = 0;
+      if (wordList.length > 0) {
+        const phaseIndex = Math.floor(elapsed / PHASE_MS) % wordList.length;
+        const phase = (elapsed % PHASE_MS) / PHASE_MS;
+        let morph = 0;
+        if (phase < MORPH_IN_START) morph = 0;
+        else if (phase < MORPH_IN_END)
+          morph = (phase - MORPH_IN_START) / (MORPH_IN_END - MORPH_IN_START);
+        else if (phase < MORPH_OUT_START) morph = 1;
+        else if (phase < MORPH_OUT_END)
+          morph =
+            1 - (phase - MORPH_OUT_START) / (MORPH_OUT_END - MORPH_OUT_START);
+        else morph = 0;
+        morphEased = easeInOutCubic(morph);
+        const candidate = wordList[phaseIndex];
+        if (candidate && candidate.length >= particles.length) {
+          wordTargets = candidate;
+        } else {
+          morphEased = 0;
+        }
+      }
 
       ctx.clearRect(0, 0, size, size);
       ctx.fillStyle = muted ? "#AAAAAA" : "#1A1A1A";
@@ -211,9 +221,11 @@ export function MiraOrb({
         const p = particles[i];
         const blobX = cx + Math.cos(p.homeAngle + swirl) * p.homeRadius;
         const blobY = cy + Math.sin(p.homeAngle + swirl) * p.homeRadius;
-        const word = wordTargets[i];
-        const homeX = blobX * (1 - morphEased) + word.x * morphEased;
-        const homeY = blobY * (1 - morphEased) + word.y * morphEased;
+        const word = wordTargets ? wordTargets[i] : undefined;
+        const targetX = word ? word.x : blobX;
+        const targetY = word ? word.y : blobY;
+        const homeX = blobX * (1 - morphEased) + targetX * morphEased;
+        const homeY = blobY * (1 - morphEased) + targetY * morphEased;
 
         const wave = Math.sin(waveTime + i * 0.15) * waveAmp * (1 - morphEased * 0.7);
         const dx = homeX - p.x;
