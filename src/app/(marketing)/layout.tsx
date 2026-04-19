@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SynapseLogo } from "@/components/synapse-logo";
+import { ReserveDeviceModal } from "@/components/reserve-device-modal";
 import { cn } from "@/lib/utils";
+
+const RESERVE_SEEN_KEY = "synapse_reserve_seen";
 
 export default function MarketingLayout({
   children,
@@ -13,7 +16,28 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [reserveOpen, setReserveOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (pathname !== "/") return;
+    if (window.localStorage.getItem(RESERVE_SEEN_KEY)) return;
+    const t = window.setTimeout(() => setReserveOpen(true), 800);
+    return () => window.clearTimeout(t);
+  }, [pathname]);
+
+  const closeReserve = () => {
+    setReserveOpen(false);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(RESERVE_SEEN_KEY, "1");
+    }
+  };
+
+  const openWaitlist = () => {
+    setMobileMenuOpen(false);
+    setReserveOpen(true);
+  };
 
   const navLinks = [
     { href: "/", label: "Synapse" },
@@ -24,6 +48,8 @@ export default function MarketingLayout({
 
   return (
     <div className="min-h-screen bg-[#F5F5F3]">
+      <ReserveDeviceModal open={reserveOpen} onClose={closeReserve} />
+
       {/* Mobile Nav */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#F5F5F3]/95 backdrop-blur-sm border-b border-[#E5E5E3]">
         <div className="flex items-center justify-between px-6 h-14">
@@ -57,21 +83,21 @@ export default function MarketingLayout({
                 {link.label}
               </Link>
             ))}
-            <div className="border-t border-[#E5E5E3] pt-5 flex flex-col gap-5">
+            <div className="border-t border-[#E5E5E3] pt-5 flex flex-col gap-4 items-start">
               <Link
-                href="/login"
+                href="/preview"
                 className="text-[#888888] text-[15px] font-sans hover:text-[#1A1A1A] transition-colors duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Try Demo
               </Link>
-              <Link
-                href="/beta"
-                className="text-[#888888] text-[15px] font-sans hover:text-[#1A1A1A] transition-colors duration-200"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                type="button"
+                onClick={openWaitlist}
+                className="px-4 py-2 bg-[#1A1A1A] text-white text-[14px] font-sans font-medium rounded-full hover:bg-[#333333] transition-colors duration-200"
               >
                 Join Waitlist
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -79,7 +105,7 @@ export default function MarketingLayout({
 
       <div className="flex">
         {/* Desktop Sidebar Nav */}
-        <nav className="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-[220px] pt-[120px] pl-10 pr-6">
+        <nav className="hidden lg:flex flex-col fixed right-0 top-0 h-screen w-[220px] pt-[120px] pl-6 pr-10">
           <Link href="/" className="mb-8">
             <SynapseLogo className="h-8 w-8" />
           </Link>
@@ -99,24 +125,25 @@ export default function MarketingLayout({
               </Link>
             ))}
           </div>
-          <div className="border-t border-[#E5E5E3] mt-6 pt-6 flex flex-col gap-3">
+          <div className="border-t border-[#E5E5E3] mt-6 pt-6 flex flex-col gap-4 items-start">
             <Link
-              href="/login"
+              href="/preview"
               className="text-[#888888] text-[15px] font-sans hover:text-[#1A1A1A] transition-colors duration-200"
             >
               Try Demo
             </Link>
-            <Link
-              href="/beta"
-              className="text-[#888888] text-[15px] font-sans hover:text-[#1A1A1A] transition-colors duration-200"
+            <button
+              type="button"
+              onClick={openWaitlist}
+              className="px-4 py-2 bg-[#1A1A1A] text-white text-[14px] font-sans font-medium rounded-full hover:bg-[#333333] transition-colors duration-200"
             >
               Join Waitlist
-            </Link>
+            </button>
           </div>
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-[220px] px-5 sm:px-10 lg:px-10 xl:px-14 pt-20 lg:pt-[120px] w-full max-w-[860px]">
+        <main className="flex-1 lg:ml-auto lg:mr-[220px] px-5 sm:px-10 lg:px-10 xl:px-14 pt-20 lg:pt-[120px] w-full max-w-[860px]">
           {children}
         </main>
       </div>
