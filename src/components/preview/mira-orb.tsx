@@ -165,6 +165,8 @@ export function MiraOrb({
     const start = performance.now();
     let swirl = 0;
     let waveTime = 0;
+    let travelTime = 0;
+    let waveFrac = 0;
 
     const loop = (now: number) => {
       const t = (now - start) / 1000;
@@ -180,6 +182,10 @@ export function MiraOrb({
       const waveFreq = 0.03 + energy * 0.05;
       const tension = 0.07;
       const damping = 0.88;
+
+      const speakingTarget = Math.min(1, userAmp * 2.5);
+      waveFrac += (speakingTarget - waveFrac) * 0.12;
+      travelTime += 0.055 + userAmp * 0.08;
 
       swirl += swirlSpeed;
       waveTime += waveFreq;
@@ -217,17 +223,30 @@ export function MiraOrb({
       const mouseRadius = 70;
       const mouseRadius2 = mouseRadius * mouseRadius;
 
+      const bandAmp = Math.max(0.18, userAmp) * size * 0.24;
+      const bandHalfWidth = size * 0.42;
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         const blobX = cx + Math.cos(p.homeAngle + swirl) * p.homeRadius;
         const blobY = cy + Math.sin(p.homeAngle + swirl) * p.homeRadius;
-        const word = wordTargets ? wordTargets[i] : undefined;
-        const targetX = word ? word.x : blobX;
-        const targetY = word ? word.y : blobY;
-        const homeX = blobX * (1 - morphEased) + targetX * morphEased;
-        const homeY = blobY * (1 - morphEased) + targetY * morphEased;
 
-        const wave = Math.sin(waveTime + i * 0.15) * waveAmp * (1 - morphEased * 0.7);
+        const frac = i / particles.length;
+        const wavePhase = frac * Math.PI * 5 - travelTime * 2.4;
+        const waveBandX = cx + (frac - 0.5) * 2 * bandHalfWidth;
+        const waveBandY = cy + Math.sin(wavePhase) * bandAmp;
+
+        const idleX = blobX * (1 - waveFrac) + waveBandX * waveFrac;
+        const idleY = blobY * (1 - waveFrac) + waveBandY * waveFrac;
+
+        const word = wordTargets ? wordTargets[i] : undefined;
+        const targetX = word ? word.x : idleX;
+        const targetY = word ? word.y : idleY;
+        const homeX = idleX * (1 - morphEased) + targetX * morphEased;
+        const homeY = idleY * (1 - morphEased) + targetY * morphEased;
+
+        const jitterScale = (1 - morphEased * 0.7) * (1 - waveFrac * 0.6);
+        const wave = Math.sin(waveTime + i * 0.15) * waveAmp * jitterScale;
         const dx = homeX - p.x;
         const dy = homeY - p.y + wave;
 
