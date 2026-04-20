@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CardEvent } from "@/lib/mira/tools";
+import { runTool } from "@/lib/mira/tools";
 
 export type MiraStatus =
   | "idle"
@@ -32,6 +34,7 @@ export function useMiraSession() {
   const [status, setStatus] = useState<MiraStatus>("idle");
   const [muted, setMuted] = useState(false);
   const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
+  const [cards, setCards] = useState<CardEvent[]>([]);
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
@@ -116,9 +119,27 @@ export function useMiraSession() {
     miraPartialRef.current = "";
   }, []);
 
+  const appendCard = useCallback((card: CardEvent) => {
+    setCards((prev) => {
+      const next = [...prev, card];
+      return next.slice(-12);
+    });
+  }, []);
+
+  const clearCards = useCallback(() => {
+    setCards([]);
+  }, []);
+
   const handleEvent = useCallback(
     (raw: string) => {
-      let ev: { type?: string; transcript?: string; delta?: string };
+      let ev: {
+        type?: string;
+        transcript?: string;
+        delta?: string;
+        name?: string;
+        arguments?: string;
+        call_id?: string;
+      };
       try {
         ev = JSON.parse(raw);
       } catch {
@@ -148,8 +169,24 @@ export function useMiraSession() {
         finalizeMira();
         return;
       }
+
+      if (
+        ev.type === "response.function_call_arguments.done" &&
+        typeof ev.name === "string" &&
+        typeof ev.arguments === "string"
+      ) {
+        let parsed: Record<string, unknown> = {};
+        try {
+          parsed = JSON.parse(ev.arguments) as Record<string, unknown>;
+        } catch {
+          return;
+        }
+        const card = runTool(ev.name, parsed);
+        if (card) appendCard(card);
+        return;
+      }
     },
-    [appendLine, updateMiraPartial, finalizeMira]
+    [appendLine, updateMiraPartial, finalizeMira, appendCard]
   );
 
   const teardown = useCallback(() => {
@@ -293,15 +330,17 @@ export function useMiraSession() {
     endTimerRef.current = window.setTimeout(() => {
       setStatus("ending");
       teardown();
+      clearCards();
       setStatus("idle");
     }, MAX_SESSION_MS);
-  }, [handleEvent, startRafLoop, status, teardown]);
+  }, [handleEvent, startRafLoop, status, teardown, clearCards]);
 
   const end = useCallback(() => {
     setStatus("ending");
     teardown();
+    clearCards();
     setStatus("idle");
-  }, [teardown]);
+  }, [teardown, clearCards]);
 
   const toggleMute = useCallback(() => {
     const stream = micStreamRef.current;
@@ -323,10 +362,12 @@ export function useMiraSession() {
     status,
     muted,
     transcript,
+    cards,
     userAmpRef,
     modelAmpRef,
     start,
     end,
     toggleMute,
+    clearCards,
   };
 }
