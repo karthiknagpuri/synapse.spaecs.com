@@ -54,6 +54,59 @@ export function MiraCard({ event }: Props) {
     );
   }, [event.id]);
 
+  if (event.type === "todo") {
+    return (
+      <div
+        ref={ref}
+        className="relative w-full rounded-[26px] px-5 pt-4 pb-5 opacity-0 overflow-hidden"
+        style={{
+          willChange: "transform, opacity",
+          background:
+            "linear-gradient(135deg, #e3ecd3 0%, #f1ebd7 34%, #e4d5e6 64%, #d0ddca 100%)",
+          boxShadow: "0 6px 18px rgba(26, 26, 26, 0.08)",
+        }}
+      >
+        <MiraSparkle />
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className="inline-block w-3.5 h-3.5 rounded-[4px]"
+              style={{ background: "#6f8a54" }}
+            />
+            <span className="text-[13px] font-sans font-medium text-[#2a3321]">
+              Todo
+            </span>
+            <span className="text-[#2a3321]/70 text-[13px] leading-none">
+              ›
+            </span>
+          </div>
+          <span
+            aria-hidden="true"
+            className="text-[#2a3321]/50 text-[16px] tracking-widest leading-none"
+          >
+            •••
+          </span>
+        </div>
+        <p className="text-[#1A1A1A] text-[17px] sm:text-[18px] font-sans font-semibold leading-[1.3] mb-4">
+          {event.payload.title}
+        </p>
+        <div className="flex items-center justify-center gap-1.5 mb-4">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6f8a54]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6f8a54]/30" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6f8a54]/30" />
+        </div>
+        <button
+          type="button"
+          className="w-full h-11 rounded-full text-white text-[14px] font-sans font-medium transition-opacity duration-200 hover:opacity-90"
+          style={{ background: "#8fa37a" }}
+        >
+          {event.payload.due ? `Due ${event.payload.due}` : "Confirm"}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={ref}
