@@ -167,6 +167,7 @@ export function MiraOrb({
     let waveTime = 0;
     let travelTime = 0;
     let waveFrac = 0;
+    let modelFrac = 0;
 
     const loop = (now: number) => {
       const t = (now - start) / 1000;
@@ -185,7 +186,9 @@ export function MiraOrb({
 
       const speakingTarget = Math.min(1, userAmp * 2.5);
       waveFrac += (speakingTarget - waveFrac) * 0.12;
-      travelTime += 0.055 + userAmp * 0.08;
+      const modelTarget = Math.min(1, modelAmp * 2.5);
+      modelFrac += (modelTarget - modelFrac) * 0.12;
+      travelTime += 0.055 + userAmp * 0.08 + modelAmp * 0.07;
 
       swirl += swirlSpeed;
       waveTime += waveFreq;
@@ -226,10 +229,18 @@ export function MiraOrb({
       const bandAmp = Math.max(0.18, userAmp) * size * 0.24;
       const bandHalfWidth = size * 0.42;
 
+      const basePulse = 1 + modelFrac * 0.38;
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        const blobX = cx + Math.cos(p.homeAngle + swirl) * p.homeRadius;
-        const blobY = cy + Math.sin(p.homeAngle + swirl) * p.homeRadius;
+        const ringRipple =
+          Math.sin(p.homeAngle * 3 - travelTime * 2.4) *
+          modelFrac *
+          p.homeRadius *
+          0.28;
+        const effRadius = p.homeRadius * basePulse + ringRipple;
+        const blobX = cx + Math.cos(p.homeAngle + swirl) * effRadius;
+        const blobY = cy + Math.sin(p.homeAngle + swirl) * effRadius;
 
         const frac = i / particles.length;
         const wavePhase = frac * Math.PI * 5 - travelTime * 2.4;
