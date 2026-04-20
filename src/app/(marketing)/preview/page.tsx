@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { MiraOrb } from "@/components/preview/mira-orb";
 import { MiraPanel } from "@/components/preview/mira-panel";
+import { BouncingWord } from "@/components/preview/bouncing-word";
 import { useMiraSession } from "@/components/preview/mira-session";
+
+const MAX_USER_WORDS = 5;
 
 export default function PreviewPage() {
   const {
@@ -20,6 +23,30 @@ export default function PreviewPage() {
 
   const live = status === "live";
   const busy = status === "requesting-mic" || status === "connecting";
+
+  const lastUserLine = useMemo(() => {
+    for (let i = transcript.length - 1; i >= 0; i--) {
+      if (transcript[i].speaker === "user") return transcript[i];
+    }
+    return null;
+  }, [transcript]);
+
+  const miraLine = useMemo(() => {
+    for (let i = transcript.length - 1; i >= 0; i--) {
+      if (transcript[i].speaker === "mira") return transcript[i];
+    }
+    return null;
+  }, [transcript]);
+
+  const userWords = useMemo(() => {
+    if (!lastUserLine) return [] as { id: string; word: string }[];
+    const tokens = lastUserLine.text.trim().split(/\s+/).filter(Boolean);
+    const recent = tokens.slice(-MAX_USER_WORDS);
+    return recent.map((word, idx) => ({
+      id: `${lastUserLine.id}-${tokens.length - recent.length + idx}`,
+      word,
+    }));
+  }, [lastUserLine]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -70,25 +97,29 @@ export default function PreviewPage() {
           />
         </div>
 
-        <div className="min-h-[72px] max-w-[540px] w-full px-4 mb-10" aria-live="polite">
-          {transcript.length === 0 ? (
-            <p className="text-[#AAAAAA] text-[14px] font-sans">
-              {live ? "Listening…" : "Press start to begin."}
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {transcript.slice(-2).map((line) => (
-                <p
-                  key={line.id}
-                  className={
-                    "text-[15px] font-sans leading-[1.6] " +
-                    (line.speaker === "mira" ? "text-[#1A1A1A]" : "text-[#888888]")
-                  }
-                >
-                  {line.text}
-                </p>
+        <div className="min-h-[120px] max-w-[540px] w-full px-4 mb-10" aria-live="polite">
+          {userWords.length > 0 ? (
+            <div className="flex flex-wrap justify-center gap-2 mb-3">
+              {userWords.map((w, i) => (
+                <BouncingWord key={w.id} text={w.word} delay={i * 70} />
               ))}
             </div>
+          ) : live && !miraLine ? (
+            <p className="text-[#AAAAAA] text-[14px] font-sans text-center">
+              Listening…
+            </p>
+          ) : null}
+
+          {miraLine && (
+            <p className="text-[15px] font-sans leading-[1.6] text-[#1A1A1A] text-center">
+              {miraLine.text}
+            </p>
+          )}
+
+          {!live && !lastUserLine && !miraLine && (
+            <p className="text-[#AAAAAA] text-[14px] font-sans text-center">
+              Press start to begin.
+            </p>
           )}
         </div>
 

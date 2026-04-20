@@ -147,8 +147,13 @@ export function useMiraSession() {
       }
       if (!ev.type) return;
 
+      if (process.env.NODE_ENV !== "production") {
+        console.debug("[mira-event]", ev.type);
+      }
+
       if (
-        ev.type === "conversation.item.input_audio_transcription.completed" &&
+        (ev.type === "conversation.item.input_audio_transcription.completed" ||
+          ev.type === "conversation.item.input_audio_transcription.done") &&
         typeof ev.transcript === "string"
       ) {
         appendLine({
@@ -159,6 +164,7 @@ export function useMiraSession() {
         });
         return;
       }
+
 
       if (ev.type === "response.audio_transcript.delta" && typeof ev.delta === "string") {
         updateMiraPartial(ev.delta);
