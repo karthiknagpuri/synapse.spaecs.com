@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MIRA_MODEL, MIRA_PROMPT, MIRA_VOICE } from "@/lib/mira/prompt";
+import { MIRA_TOOLS } from "@/lib/mira/tools";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +62,8 @@ export async function POST(req: NextRequest) {
           prefix_padding_ms: 300,
           silence_duration_ms: 400,
         },
+        tools: MIRA_TOOLS,
+        tool_choice: "auto",
       }),
     });
 
