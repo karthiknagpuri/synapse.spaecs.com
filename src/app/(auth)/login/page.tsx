@@ -1,10 +1,15 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { SynapseLogo } from "@/components/synapse-logo";
 import { Button } from "@/components/ui/button";
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
+
   const handleGoogleLogin = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -33,6 +38,16 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {error && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm text-red-700">
+              {error === "auth_failed"
+                ? "Sign in failed. Please try again."
+                : "Something went wrong. Please try again."}
+            </p>
+          </div>
+        )}
+
         <Button
           onClick={handleGoogleLogin}
           variant="outline"
@@ -52,5 +67,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <LoginContent />
+    </Suspense>
   );
 }

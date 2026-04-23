@@ -62,7 +62,7 @@ export async function POST(
 
   const config: Record<string, string> = {};
   const webhookToken = crypto.randomBytes(24).toString("hex");
-  let webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://synapseai.com"}/api/webhooks/${platform}/${webhookToken}`;
+  let webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://wearsynapse.com"}/api/webhooks/${platform}/${webhookToken}`;
 
   if (platform === "email") {
     // Generate unique group email address

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     invitation: data,
-    invite_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://synapseai.com"}/invite/${inviteCode}`,
+    invite_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://wearsynapse.com"}/invite/${inviteCode}`,
   });
 }
 

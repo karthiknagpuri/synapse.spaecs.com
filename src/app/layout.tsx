@@ -22,6 +22,15 @@ export const metadata: Metadata = {
   title: "Synapse — Relationships are the infrastructure of progress.",
   description:
     "Hardware, voice, and infrastructure for relationship intelligence. Synapse builds the layer that makes connections programmable, memorable, and alive.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

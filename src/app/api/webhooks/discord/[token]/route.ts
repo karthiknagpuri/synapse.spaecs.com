@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
-  const webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://synapseai.com"}/api/webhooks/discord/${token}`;
+  const webhookUrl = `${process.env.NEXT_PUBLIC_SITE_URL || "https://wearsynapse.com"}/api/webhooks/discord/${token}`;
 
   const body = await request.json();
 

@@ -5,6 +5,7 @@ import crypto from "crypto";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RATE_LIMIT_WINDOW_MINUTES = 60;
 const RATE_LIMIT_MAX = 5;
+const GUESS_COUNT_BASELINE = 300;
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,7 +27,7 @@ export async function GET() {
   if (error) {
     return NextResponse.json({ error: "count_failed" }, { status: 500 });
   }
-  return NextResponse.json({ count: count ?? 0 });
+  return NextResponse.json({ count: (count ?? 0) + GUESS_COUNT_BASELINE });
 }
 
 export async function POST(req: NextRequest) {
@@ -103,5 +104,5 @@ export async function POST(req: NextRequest) {
     .from("waitlist_guesses")
     .select("*", { count: "exact", head: true });
 
-  return NextResponse.json({ success: true, count: count ?? 0 });
+  return NextResponse.json({ success: true, count: (count ?? 0) + GUESS_COUNT_BASELINE });
 }
