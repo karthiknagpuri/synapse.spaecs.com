@@ -83,6 +83,56 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Press */}
+      <section className="border-t border-[#E5E5E3] pt-10 pb-10 lg:pt-12 lg:pb-12">
+        <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-[0.14em] mb-6">
+          As seen on
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {[
+            {
+              publisher: "The Economic Times",
+              title:
+                "Y Combinator\u2019s first Startup School event in India helps techies land jobs, gigs",
+              url: "https://economictimes.indiatimes.com/tech/technology/y-combinators-first-startup-school-event-in-india-helps-techies-land-jobs-gigs-but/articleshow/130372140.cms",
+            },
+            {
+              publisher: "Hindustan Times",
+              title:
+                "Only in Bengaluru: security guard at YC event pitches product to Harvard-educated entrepreneur",
+              url: "https://www.hindustantimes.com/trending/only-in-bengaluru-security-guard-at-yc-event-pitches-product-to-harvard-educated-entrepreneur-101776573400084.html",
+            },
+            {
+              publisher: "News Karnataka",
+              title:
+                "Security guard steals spotlight at YC Bengaluru event",
+              url: "https://newskarnataka.com/bengaluru/security-guard-steals-spotlight-at-yc-bengaluru-event/21042026",
+            },
+          ].map((item) => (
+            <a
+              key={item.url}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col gap-2 rounded-lg border border-[#E5E5E3] bg-white px-4 py-4 hover:border-[#AAAAAA] transition-colors duration-200"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[14px] font-serif text-[#1A1A1A] leading-none">
+                  {item.publisher}
+                </span>
+                <ArrowUpRight
+                  size={14}
+                  className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200 shrink-0"
+                />
+              </div>
+              <p className="text-[12px] font-sans text-[#888888] leading-[1.5] line-clamp-3">
+                {item.title}
+              </p>
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* Goal 01 — Hardware */}
       <GoalSection
         number="01"
