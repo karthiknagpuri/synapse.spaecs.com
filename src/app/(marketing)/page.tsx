@@ -82,40 +82,130 @@ export default function LandingPage() {
 
       {/* Press */}
       <section className="pt-8 pb-8 lg:pt-10 lg:pb-10">
-        <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-[0.14em] mb-4">
+        <p className="text-[#AAAAAA] text-[11px] font-sans uppercase tracking-[0.14em] mb-6">
           As seen on
         </p>
-        <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-          {[
-            {
-              publisher: "The Economic Times",
-              url: "https://economictimes.indiatimes.com/tech/technology/y-combinators-first-startup-school-event-in-india-helps-techies-land-jobs-gigs-but/articleshow/130372140.cms",
-            },
-            {
-              publisher: "Hindustan Times",
-              url: "https://www.hindustantimes.com/trending/only-in-bengaluru-security-guard-at-yc-event-pitches-product-to-harvard-educated-entrepreneur-101776573400084.html",
-            },
-            {
-              publisher: "News Karnataka",
-              url: "https://newskarnataka.com/bengaluru/security-guard-steals-spotlight-at-yc-bengaluru-event/21042026",
-            },
-          ].map((item) => (
-            <a
-              key={item.url}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-1.5 text-[15px] font-serif text-[#1A1A1A]"
+        <div className="flex flex-wrap items-center gap-x-10 gap-y-5">
+          <a
+            href="https://economictimes.indiatimes.com/tech/technology/y-combinators-first-startup-school-event-in-india-helps-techies-land-jobs-gigs-but/articleshow/130372140.cms"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="The Economic Times — article"
+            className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
+          >
+            <svg
+              viewBox="0 0 200 32"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-auto"
+              role="img"
+              aria-hidden="true"
             >
-              <span className="underline underline-offset-4 decoration-[#E5E5E3] group-hover:decoration-[#1A1A1A] transition-colors duration-200">
-                {item.publisher}
-              </span>
-              <ArrowUpRight
-                size={14}
-                className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
-              />
-            </a>
-          ))}
+              <rect x="0" y="0" width="40" height="32" fill="#ED1C24" />
+              <text
+                x="20"
+                y="22"
+                textAnchor="middle"
+                fill="#FFFFFF"
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  fontStyle: "italic",
+                }}
+              >
+                ET
+              </text>
+              <text
+                x="48"
+                y="22"
+                fill="#1A1A1A"
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: "0.01em",
+                }}
+              >
+                The Economic Times
+              </text>
+            </svg>
+            <ArrowUpRight
+              size={14}
+              className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
+            />
+          </a>
+
+          <a
+            href="https://www.hindustantimes.com/trending/only-in-bengaluru-security-guard-at-yc-event-pitches-product-to-harvard-educated-entrepreneur-101776573400084.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Hindustan Times — article"
+            className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
+          >
+            <svg
+              viewBox="0 0 210 32"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-auto"
+              role="img"
+              aria-hidden="true"
+            >
+              <text
+                x="0"
+                y="22"
+                fill="#C8102E"
+                style={{
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontSize: 18,
+                  fontWeight: 800,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Hindustan Times
+              </text>
+              <rect x="0" y="26" width="180" height="1.6" fill="#C8102E" />
+            </svg>
+            <ArrowUpRight
+              size={14}
+              className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
+            />
+          </a>
+
+          <a
+            href="https://newskarnataka.com/bengaluru/security-guard-steals-spotlight-at-yc-bengaluru-event/21042026"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="News Karnataka — article"
+            className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
+          >
+            <svg
+              viewBox="0 0 210 32"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-auto"
+              role="img"
+              aria-hidden="true"
+            >
+              <text
+                x="0"
+                y="22"
+                style={{
+                  fontFamily:
+                    "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  fontSize: 17,
+                  fontWeight: 800,
+                  letterSpacing: "0.02em",
+                }}
+              >
+                <tspan fill="#003A70">NEWS</tspan>
+                <tspan fill="#1A1A1A" dx="6">
+                  KARNATAKA
+                </tspan>
+              </text>
+            </svg>
+            <ArrowUpRight
+              size={14}
+              className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
+            />
+          </a>
         </div>
       </section>
 
