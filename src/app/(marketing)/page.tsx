@@ -90,45 +90,16 @@ export default function LandingPage() {
             href="https://economictimes.indiatimes.com/tech/technology/y-combinators-first-startup-school-event-in-india-helps-techies-land-jobs-gigs-but/articleshow/130372140.cms"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="The Economic Times — article"
+            aria-label="The Indian Express — article"
             className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
           >
-            <svg
-              viewBox="0 0 200 32"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-auto"
-              role="img"
-              aria-hidden="true"
-            >
-              <rect x="0" y="0" width="40" height="32" fill="#ED1C24" />
-              <text
-                x="20"
-                y="22"
-                textAnchor="middle"
-                fill="#FFFFFF"
-                style={{
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontSize: 18,
-                  fontWeight: 700,
-                  fontStyle: "italic",
-                }}
-              >
-                ET
-              </text>
-              <text
-                x="48"
-                y="22"
-                fill="#1A1A1A"
-                style={{
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  letterSpacing: "0.01em",
-                }}
-              >
-                The Economic Times
-              </text>
-            </svg>
+            <Image
+              src="/press/ie.png"
+              alt="The Indian Express"
+              width={240}
+              height={24}
+              className="h-6 w-auto object-contain"
+            />
             <ArrowUpRight
               size={14}
               className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
@@ -142,28 +113,13 @@ export default function LandingPage() {
             aria-label="Hindustan Times — article"
             className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
           >
-            <svg
-              viewBox="0 0 210 32"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-auto"
-              role="img"
-              aria-hidden="true"
-            >
-              <text
-                x="0"
-                y="22"
-                fill="#C8102E"
-                style={{
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontSize: 18,
-                  fontWeight: 800,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Hindustan Times
-              </text>
-              <rect x="0" y="26" width="180" height="1.6" fill="#C8102E" />
-            </svg>
+            <Image
+              src="/press/ht.png"
+              alt="Hindustan Times"
+              width={186}
+              height={24}
+              className="h-6 w-auto object-contain"
+            />
             <ArrowUpRight
               size={14}
               className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
@@ -177,30 +133,13 @@ export default function LandingPage() {
             aria-label="News Karnataka — article"
             className="group inline-flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity duration-200"
           >
-            <svg
-              viewBox="0 0 210 32"
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-auto"
-              role="img"
-              aria-hidden="true"
-            >
-              <text
-                x="0"
-                y="22"
-                style={{
-                  fontFamily:
-                    "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontSize: 17,
-                  fontWeight: 800,
-                  letterSpacing: "0.02em",
-                }}
-              >
-                <tspan fill="#003A70">NEWS</tspan>
-                <tspan fill="#1A1A1A" dx="6">
-                  KARNATAKA
-                </tspan>
-              </text>
-            </svg>
+            <Image
+              src="/press/nk.svg"
+              alt="News Karnataka"
+              width={144}
+              height={24}
+              className="h-6 w-auto object-contain"
+            />
             <ArrowUpRight
               size={14}
               className="text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors duration-200"
